@@ -77,8 +77,11 @@ document.getElementById("btnSubir").addEventListener("click", async () => {
     });
     if (!rpc.ok) throw new Error("fallo guardar");
 
-    mensaje.textContent = "¡Listo! Ya puedes volver a la app.";
+    mensaje.textContent = "¡Listo! Volviendo a la app...";
     mensaje.className = "mensaje ok";
+    setTimeout(() => {
+      window.location.href = "https://jtcapsco-alt.github.io/PlanifyKof-web/app/";
+    }, 1500);
   } catch (err) {
     mensaje.textContent = "Algo salió mal, intenta de nuevo.";
     mensaje.className = "mensaje error";
