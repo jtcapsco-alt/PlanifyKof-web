@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Subir foto - PlanifyKOF</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600;700&display=swap');
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: #F2F0EA; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+.caja { background: white; border-radius: 12px; padding: 32px 24px; max-width: 360px; width: 100%; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+.titulo { font-family: 'Archivo Black', sans-serif; font-size: 20px; margin-bottom: 4px; }
+.titulo span { color: #E4122A; }
+.sub { color: #8A8D91; font-size: 12px; margin-bottom: 24px; }
+input[type=file] { display: block; margin: 0 auto 20px; width: 100%; }
+button { background: #111; color: white; border: none; padding: 14px; width: 100%; border-radius: 6px; font-weight: 700; font-size: 14px; }
+button:disabled { background: #ccc; }
+.mensaje { margin-top: 16px; font-size: 13px; }
+.ok { color: #1FAA59; }
+.error { color: #E4122A; }
+</style>
+</head>
+<body>
+<div class="caja">
+  <div class="titulo">SUBIR <span>FOTO</span></div>
+  <div class="sub">Elige tu foto de perfil para PlanifyKOF</div>
+  <input type="file" id="archivo" accept="image/*">
+  <button id="btnSubir">SUBIR FOTO</button>
+  <div class="mensaje" id="mensaje"></div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://amkhmonrextiphtldags.supabase.co";
+const SUPABASE_KEY = "sb_publishable_GjZZmjKqWOlBwMGawqK4mQ_js6oy_D3";
+
+const params = new URLSearchParams(window.location.search);
+const usuarioId = params.get("u");
+const codigo = params.get("c") || "user";
+
+document.getElementById("btnSubir").addEventListener("click", async () => {
+  const input = document.getElementById("archivo");
+  const mensaje = document.getElementById("mensaje");
+  const boton = document.getElementById("btnSubir");
+
+  if (!input.files || !input.files[0]) {
+    mensaje.textContent = "Primero elige una foto.";
+    mensaje.className = "mensaje error";
+    return;
+  }
+  if (!usuarioId) {
+    mensaje.textContent = "Link inválido (falta usuario).";
+    mensaje.className = "mensaje error";
+    return;
+  }
+
+  boton.disabled = true;
+  mensaje.textContent = "Subiendo...";
+  mensaje.className = "mensaje";
+
+  const archivo = input.files[0];
+  const nombreArchivo = codigo + "_" + Date.now() + ".jpg";
+
+  try {
+    const subida = await fetch(`${SUPABASE_URL}/storage/v1/object/fotos-perfil/${nombreArchivo}`, {
+      method: "POST",
+      headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": archivo.type },
+      body: archivo,
+    });
+    if (!subida.ok) throw new Error("fallo subida");
+
+    const urlPublica = `${SUPABASE_URL}/storage/v1/object/public/fotos-perfil/${nombreArchivo}`;
+
+    const rpc = await fetch(`${SUPABASE_URL}/rest/v1/rpc/actualizar_mi_foto`, {
+      method: "POST",
+      headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ p_usuario_id: parseInt(usuarioId), p_foto_url: urlPublica }),
+    });
+    if (!rpc.ok) throw new Error("fallo guardar");
+
+    mensaje.textContent = "¡Listo! Ya puedes volver a la app.";
+    mensaje.className = "mensaje ok";
+  } catch (err) {
+    mensaje.textContent = "Algo salió mal, intenta de nuevo.";
+    mensaje.className = "mensaje error";
+    boton.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
