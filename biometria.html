@@ -124,18 +124,29 @@ function estadoValidando() {
   mensaje.textContent = "";
 }
 
+let usuarioVerificado = null;  // se llena cuando el servidor confirma quien es
+
 function estadoExito() {
   anillo.classList.remove("visible");
   circulo.classList.add("exito");
   textoEstado.textContent = "¡Listo!";
   setTimeout(() => {
-    if (modo === "activar") {
-      // Avisa a la app, al volver, que este dispositivo ya quedo activado
-      // -- asi la app puede esconder el link de "Face ID/Huella" para siempre.
-      window.location.href = `${URL_APP}?biometria_activada=1&u=${usuarioId}`;
-    } else {
-      window.location.href = URL_APP;
+    // Mandamos TODOS los datos del usuario de vuelta a la app, para que
+    // entre DIRECTO a su cuenta -- sin pasar por el carrusel ni el login.
+    const params = new URLSearchParams({ biometria: "ok" });
+    if (usuarioVerificado) {
+      params.set("u", usuarioVerificado.id);
+      params.set("nombre", usuarioVerificado.nombre_completo || "");
+      params.set("codigo_u", usuarioVerificado.codigo || "");
+      params.set("rol", usuarioVerificado.rol || "");
+      params.set("linea_id", usuarioVerificado.linea_id ?? "");
     }
+    if (modo === "activar") {
+      // Ademas, avisa que ESTE dispositivo ya quedo activado -- asi la app
+      // esconde el link de "Face ID/Huella" para siempre en este celular.
+      params.set("biometria_activada", "1");
+    }
+    window.location.href = `${URL_APP}?${params.toString()}`;
   }, 1200);
 }
 
@@ -163,6 +174,7 @@ async function activarBiometria() {
     plataforma: /iPhone|iPad/.test(navigator.userAgent) ? "ios" : "android",
   });
   if (!resultado.verified) throw new Error("No se pudo verificar. Intenta de nuevo.");
+  usuarioVerificado = resultado.usuario;
 }
 
 async function loginBiometria() {
@@ -175,6 +187,7 @@ async function loginBiometria() {
     challenge_enviado: opciones.challenge,
   });
   if (!resultado.verified) throw new Error("No se pudo verificar. Intenta de nuevo.");
+  usuarioVerificado = resultado.usuario;
 }
 
 circulo.addEventListener("click", async () => {
