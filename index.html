@@ -5,6 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>PlanifyKOF</title>
 
+<!-- Revision INMEDIATA, antes de pintar cualquier cosa: si ya esta instalada,
+     manda derecho a la app sin mostrar ni el logo ni el texto de esta pantalla.
+     Un script en <head> sin defer/async bloquea el pintado hasta que termina,
+     asi que si redirige aqui, el usuario nunca alcanza a ver el flash. -->
+<script>
+  if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+    window.location.replace("./app/");
+  }
+</script>
+
 <!-- Metadatos para que, al "Agregar a inicio", el icono y nombre salgan correctos -->
 <link rel="apple-touch-icon" href="icon.png?v=2">
 <meta name="apple-mobile-web-app-capable" content="yes">
