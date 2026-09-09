@@ -129,7 +129,13 @@ function estadoExito() {
   circulo.classList.add("exito");
   textoEstado.textContent = "¡Listo!";
   setTimeout(() => {
-    window.location.href = URL_APP;
+    if (modo === "activar") {
+      // Avisa a la app, al volver, que este dispositivo ya quedo activado
+      // -- asi la app puede esconder el link de "Face ID/Huella" para siempre.
+      window.location.href = `${URL_APP}?biometria_activada=1&u=${usuarioId}`;
+    } else {
+      window.location.href = URL_APP;
+    }
   }, 1200);
 }
 
