@@ -1,173 +1,136 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>PlanifyKOF</title>
+<!DOCTYPE html><html><head>
+  <base href="/PlanifyKof-web/">
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="">
 
-<!-- Revision INMEDIATA, antes de pintar cualquier cosa: si ya esta instalada,
-     manda derecho a la app sin mostrar ni el logo ni el texto de esta pantalla.
-     Un script en <head> sin defer/async bloquea el pintado hasta que termina,
-     asi que si redirige aqui, el usuario nunca alcanza a ver el flash. -->
-<script>
-  if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-    window.location.replace("./app/");
-  }
-</script>
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="PlanifyKOF">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon-192.png">
 
-<!-- Metadatos para que, al "Agregar a inicio", el icono y nombre salgan correctos -->
-<link rel="apple-touch-icon" href="icon.png?v=2">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="PlanifyKOF">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#F2F0EA">
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png">
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; overflow: hidden; }
-body {
-  font-family: 'Inter', sans-serif;
-  background: #F2F0EA;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 30px 24px;
-  text-align: center;
-  color: #111;
-}
-.logo { width: 110px; height: 110px; object-fit: contain; margin-bottom: 18px; }
-.marca { font-family: 'Archivo Black', sans-serif; font-size: 24px; margin-bottom: 4px; }
-.marca span { color: #E4122A; }
-.sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #8A8D91; letter-spacing: 1px; margin-bottom: 34px; }
+  <title>PlanifyKOF</title>
+  <link rel="manifest" href="manifest.json">
 
-.instalando { display: none; }
-.instalando.activo { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 340px; }
-
-.badge {
-  font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #A32D2D;
-  background: #FBDADA; padding: 5px 12px; border-radius: 20px; margin-bottom: 22px; font-weight: 700;
-}
-
-.paso {
-  display: flex; align-items: center; gap: 14px; width: 100%;
-  background: white; border-radius: 12px; padding: 14px 16px; margin-bottom: 12px;
-  text-align: left;
-}
-.paso-num {
-  width: 26px; height: 26px; border-radius: 50%; background: #111; color: white;
-  display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0;
-}
-.paso-texto { font-size: 13.5px; line-height: 1.35; }
-.paso-texto b { color: #E4122A; }
-
-.icono-compartir {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 22px; height: 22px; border: 2px solid #111; border-radius: 5px; vertical-align: middle; margin: 0 3px;
-}
-
-.flecha {
-  margin-top: 10px;
-  animation: rebote 1.4s infinite;
-}
-@keyframes rebote {
-  0%, 100% { transform: translateY(0); opacity: 0.5; }
-  50% { transform: translateY(8px); opacity: 1; }
-}
-
-.boton-instalar-android {
-  display: none;
-  background: #E4122A; color: white; border: none; padding: 14px 28px;
-  border-radius: 8px; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 13px;
-  margin-top: 10px; width: 100%;
-}
-.boton-instalar-android.mostrar { display: block; }
-
-.footer {
-  position: absolute; bottom: 18px; font-size: 10px; color: #8A8D91;
-}
-
-.cargando { display: none; }
-.cargando.activo { display: flex; flex-direction: column; align-items: center; }
-.spinner {
-  width: 26px; height: 26px; border: 3px solid #DDD9CE; border-top-color: #E4122A;
-  border-radius: 50%; animation: girar 0.8s linear infinite; margin-top: 20px;
-}
-@keyframes girar { to { transform: rotate(360deg); } }
-</style>
-</head>
-<body>
-
-<img src="logo_planta.png" class="logo" alt="Planta Barranquilla">
-<div class="marca">PLANIFY<span>KOF</span></div>
-<div class="sub">PLANTA BARRANQUILLA</div>
-
-<div class="instalando" id="pantallaInstalar">
-  <div class="badge">CASI LISTO · FALTAN 2 PASOS</div>
-
-  <div id="pasosIOS" style="width:100%">
-    <div class="paso">
-      <div class="paso-num">1</div>
-      <div class="paso-texto">Toca el ícono de <b>Compartir</b> <span class="icono-compartir">⬆</span> en la barra de abajo de Safari.</div>
-    </div>
-    <div class="paso">
-      <div class="paso-num">2</div>
-      <div class="paso-texto">Busca y toca <b>"Agregar a inicio"</b>.</div>
-    </div>
-    <div class="flecha">⬇</div>
-  </div>
-
-  <div id="pasosAndroid" style="width:100%; display:none;">
-    <button class="boton-instalar-android" id="btnInstalarAndroid">INSTALAR PLANIFYKOF</button>
-    <div class="paso" style="margin-top:14px;">
-      <div class="paso-num">i</div>
-      <div class="paso-texto">Si no ves el botón, toca el menú <b>⋮</b> de Chrome y elige <b>"Instalar app"</b> o <b>"Agregar a pantalla de inicio"</b>.</div>
-    </div>
-  </div>
-</div>
-
-<div class="cargando" id="pantallaCargando">
-  <div class="spinner"></div>
-</div>
-
-<div class="footer">Desarrollado por Jose Torres ft. Pierina Manotas · Coca-Cola FEMSA Barranquilla</div>
-
-<script>
-  const RUTA_APP = "./app/";
-
-  function estaInstalada() {
-    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-  }
-
-  if (estaInstalada()) {
-    document.getElementById('pantallaCargando').classList.add('activo');
-    window.location.replace(RUTA_APP);
-  } else {
-    document.getElementById('pantallaInstalar').classList.add('activo');
-
-    const esIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    if (esIOS) {
-      document.getElementById('pasosIOS').style.display = 'block';
-      document.getElementById('pasosAndroid').style.display = 'none';
-    } else {
-      document.getElementById('pasosIOS').style.display = 'none';
-      document.getElementById('pasosAndroid').style.display = 'block';
+  <script>
+    var flet = {
+      pyodide: true,
+      multiView: false,
+      noCdn: "False".toLowerCase() == "true",
+      webSocketEndpoint: "/ws",
+      entrypointBaseUrl: "/PlanifyKof-web/",
+      assetBase: "/PlanifyKof-web/",
+      routeUrlStrategy: "path",
+      canvasKitBaseUrl: "/canvaskit/",
+      // .mjs is required: python-worker.js is a module worker and loads
+      // the runtime via dynamic `import()`. Pyodide >= 0.29 also refuses
+      // to run in classic workers. Use the local copy that `flet build`
+      // drops into web/pyodide/ when --no-cdn is set; otherwise pull
+      // from jsdelivr so the build artifact can stay slim.
+      
+      pyodideUrl: "https://cdn.jsdelivr.net/pyodide/v314.0.3/full/pyodide.mjs",
+      
+      pythonModuleName: "main",
+      webRenderer: "canvaskit",
+      fontFallbackBaseUrl: "assets/fonts/", // for Noto Emoji, use Google CDN
+      appPackageUrl: "assets/app/app.zip"
     }
 
-    let promptDiferido = null;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      promptDiferido = e;
-      document.getElementById('btnInstalarAndroid').classList.add('mostrar');
+    flet.flutterAppLoaded = new Promise((resolve) => {
+      flet.flutterAppResolve = resolve;
     });
 
-    document.getElementById('btnInstalarAndroid').addEventListener('click', async () => {
-      if (!promptDiferido) return;
-      promptDiferido.prompt();
-      await promptDiferido.userChoice;
-      promptDiferido = null;
+    flet.flutterAppLoaded.then((flutterApp) => {
+      console.log("Flutter app loaded");
     });
-  }
-</script>
+  </script>
+  <script src="python.js"></script>
+  <style id="splash-screen-style">
+    html {
+      height: 100%
+    }
 
-</body>
-</html>
+    body {
+      margin: 0;
+      min-height: 100%;
+      background-color: #000000;
+          background-size: 100% 100%;
+    }
+
+    .center {
+      margin: 0;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      -ms-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+    }
+
+    .contain {
+      display:block;
+      width:100%; height:100%;
+      object-fit: contain;
+    }
+
+    .stretch {
+      display:block;
+      width:100%; height:100%;
+    }
+
+    .cover {
+      display:block;
+      width:100%; height:100%;
+      object-fit: cover;
+    }
+
+    .bottom {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      -ms-transform: translate(-50%, 0);
+      transform: translate(-50%, 0);
+    }
+
+    .bottomLeft {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+    }
+
+    .bottomRight {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #000000;
+          }
+    }
+  </style>
+  <script id="splash-screen-script">
+    function removeSplashFromWeb() {
+      document.getElementById("splash")?.remove();
+      document.getElementById("splash-branding")?.remove();
+      document.body.style.background = "transparent";
+    }
+  </script>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+</head>
+
+<body>
+  <picture id="splash">
+      <source srcset="splash/img/light-1x.png 1x, splash/img/light-2x.png 2x, splash/img/light-3x.png 3x, splash/img/light-4x.png 4x" media="(prefers-color-scheme: light)">
+      <source srcset="splash/img/dark-1x.png 1x, splash/img/dark-2x.png 2x, splash/img/dark-3x.png 3x, splash/img/dark-4x.png 4x" media="(prefers-color-scheme: dark)">
+      <img class="center" aria-hidden="true" src="splash/img/light-1x.png" alt="">
+  </picture>
+  <script src="flutter_bootstrap.js" async=""></script>
+
+
+
+</body></html>
