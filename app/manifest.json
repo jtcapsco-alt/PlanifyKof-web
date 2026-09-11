@@ -1,8 +1,7 @@
-﻿{
+{
     "name": "PlanifyKOF",
     "short_name": "planifykof",
     "start_url": ".",
-    "scope": "https://jtcapsco-alt.github.io/PlanifyKof-web/",
     "display": "standalone",
     "background_color": "#FFFFFF",
     "theme_color": "#0175C2",
